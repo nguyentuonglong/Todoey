@@ -37,9 +37,10 @@ class TodoListViewControler: UITableViewController {
     
     //MARK - tableView delegate methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //itemArray[indexPath.row].done = !itemArray[indexPath.row].done
-        context.delete(itemArray[indexPath.row])
-        itemArray.remove(at: indexPath.row)
+        
+        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        //context.delete(itemArray[indexPath.row])
+        //itemArray.remove(at: indexPath.row)
         tableView.reloadData()
         tableView.deselectRow(at: indexPath, animated: false)
         self.saveItems()
@@ -74,17 +75,33 @@ class TodoListViewControler: UITableViewController {
         self.tableView.reloadData()
     }
     
-    func loadItems() {
-        let request : NSFetchRequest<Item> = Item.fetchRequest()
-        
+    func loadItems(with request : NSFetchRequest<Item> = Item.fetchRequest()) {
         do {
             itemArray = try context.fetch(request)
         } catch {
             print("Error fetching data from context \(error)")
         }
     }
-    
-    
+}
 
+//MARK -  search bar method
+extension TodoListViewControler : UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+        loadItems(with: request)
+        tableView.reloadData()
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText.count == 0 {
+            loadItems()
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+            tableView.reloadData()
+        }
+    }
 }
 
