@@ -20,8 +20,6 @@ class CategoryViewController: SwipeViewController {
         super.viewDidLoad()
         //print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         loadCategory()
-        tableView.rowHeight = 80
-        tableView.separatorStyle = .none
     }
     
     //MARK - tableView data source
@@ -33,7 +31,9 @@ class CategoryViewController: SwipeViewController {
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
         let item = categoryArray?[indexPath.row]
         cell.textLabel?.text = item?.name ?? "No category added"
-        cell.backgroundColor = UIColor.randomFlat
+        if let colorAsString = item?.color {
+            cell.backgroundColor = UIColor(hexString: colorAsString)
+        }
         return cell
     }
     
@@ -57,6 +57,7 @@ class CategoryViewController: SwipeViewController {
             //What will happen when user click
             let addedItem = Category()
             addedItem.name = textField.text!
+            addedItem.color = UIColor.randomFlat.hexValue()
             self.save(category: addedItem)
         }
         alert.addTextField { (alertTextField) in
