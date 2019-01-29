@@ -19,10 +19,25 @@ class TodoListViewControler: SwipeViewController {
             loadItems()
         }
     }
-
+    @IBOutlet weak var searchBar: UISearchBar!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        if let colorHex = selectedCategory?.color {
+            title = selectedCategory!.name
+            guard let navBar = navigationController?.navigationBar else {fatalError("Navigation controller does not exist.")}
+            if let navBarColor = UIColor(hexString: colorHex) {
+                navBar.barTintColor = navBarColor
+                navBar.tintColor = ContrastColorOf(navBarColor, returnFlat: true)
+                navBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor : ContrastColorOf(navBarColor, returnFlat: true)]
+            }
+            searchBar.layer.borderWidth = 1
+            searchBar.layer.borderColor = UIColor(hexString: colorHex)!.cgColor
+            searchBar.barTintColor = UIColor(hexString: colorHex)
+        }
     }
     
     //MARK - tableView data source

@@ -22,6 +22,16 @@ class CategoryViewController: SwipeViewController {
         loadCategory()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        guard let navBar = navigationController?.navigationBar else {fatalError("Navigation controller does not exist.")}
+        let colorHex = FlatSkyBlue().hexValue()
+        if let navBarColor = UIColor(hexString: colorHex) {
+            navBar.barTintColor = navBarColor
+            navBar.tintColor = ContrastColorOf(navBarColor, returnFlat: true)
+            navBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor : ContrastColorOf(navBarColor, returnFlat: true)]
+        }
+    }
+    
     //MARK - tableView data source
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return categoryArray?.count ?? 1
@@ -32,7 +42,9 @@ class CategoryViewController: SwipeViewController {
         let item = categoryArray?[indexPath.row]
         cell.textLabel?.text = item?.name ?? "No category added"
         if let colorAsString = item?.color {
-            cell.backgroundColor = UIColor(hexString: colorAsString)
+            let color = UIColor(hexString: colorAsString)
+            cell.backgroundColor = color
+            cell.textLabel?.textColor = ContrastColorOf(color!, returnFlat: true)
         }
         return cell
     }
